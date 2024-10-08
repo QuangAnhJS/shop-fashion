@@ -3,7 +3,7 @@ import axios from 'axios';
 export const getToken = () => localStorage.getItem("token");
 export const Role = () => localStorage.getItem("Role");
 const axiosInstance = axios.create({
-    baseURL: "http://localhost/", // URL cơ bản của API
+    baseURL: "https://fashion.anhdev.online/", // URL cơ bản của API
     headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${getToken()}` 
