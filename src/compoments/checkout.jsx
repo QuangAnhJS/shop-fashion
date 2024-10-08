@@ -1,19 +1,148 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Menu from "./menu";
 import End from "./end";
+import { Link } from "@mui/material";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import axiosInstance from "../axios";
+
 const Checkout = () => {
+  const [tinh, setTinh] = useState([]);
+  const [huyen, setHuyen] = useState([]);
+  const [xa, setXa] = useState([]);
+  const [Data, setData] = useState([]);
+  const [selectTinh, setSlectTinh] = useState("");
+  const [isselectHuyen, setSlectHuyen] = useState("");
+  const [selectXa, setSelectXa] = useState("");
+  const [input, setInput] = useState({
+    chitiet: "",
+    sdt: "",
+    nguoinhan: "",
+  });
+  const [thanhtoanOnline, setThanhtoanOnline] = useState(false);
+  const paymentOnline = (e) => {
+    e.preventDefault();
+    setThanhtoanOnline(true);
+  };
+  const handleChange = (e) => {
+    setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+  const navigate = useNavigate();
+  const location = useLocation();
+  const data = location.state;
+  const fetchData = async () => {
+    try {
+      const response = await fetch(
+        "https://provinces.open-api.vn/api/?depth=3"
+      );
+      const data = await response.json();
+      setData(data);
+      const arr = [];
+      data.forEach((element) => {
+        arr.push(element.name);
+      });
+      setTinh(arr);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const thanhtoan = async (e) => {
+    e.preventDefault();
+    console.log("chi tiết", input.chitiet);
+    if (!input.chitiet || input.chitiet.trim() === "") {
+      console.error("Chitiet field is required.");
+      return; // Dừng hàm nếu chitiet không hợp lệ
+    }
+    try {
+      const res = await axiosInstance.post("/api/user/payment", {
+        name: data && data.name,
+        size: data.size,
+        color: data.color,
+        quality: data.quantity,
+        price: data.quantity * data.price,
+        payment: 0,
+        product_id: data && data.id,
+        thanhpho: selectTinh,
+        quanhuyen: isselectHuyen,
+        xaphuong: selectXa,
+        chitiet: input.chitiet,
+        nguoinhan: input.nguoinhan,
+        sdt: input.sdt,
+      });
+      if (res.data.status === "success") {
+        navigate("/success");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handeltinh = (e) => {
+    const selectTinh = e.target.value; // Lấy giá trị tỉnh/thành phố được chọn
+    setSlectTinh(selectTinh);
+    const tinh = Data.find((tinh) => tinh.name === selectTinh); // Tìm tỉnh/thành phố
+    const arrhuyen = [];
+
+    // Nếu tìm thấy tỉnh/thành phố, lấy danh sách các quận
+    if (tinh) {
+      tinh.districts.forEach((item) => {
+        arrhuyen.push(item.name); // Thêm tên quận vào mảng
+      });
+    }
+
+    // Cập nhật state với danh sách quận
+    setHuyen(arrhuyen);
+  };
+
+  const total = (price, quantity) => {
+    return price * quantity;
+  };
+
+  const handleHuyen = (e) => {
+    const selectHuyen = e.target.value;
+    setSlectHuyen(selectHuyen); // Lấy giá trị quận được chọn
+
+    // Tìm tỉnh/thành phố tương ứng với quận được chọn
+    const tinh = Data.find((tinh) =>
+      tinh.districts.some((district) => district.name === selectHuyen)
+    );
+
+    // Tìm quận trong tỉnh/thành phố đã tìm thấy
+    const huyen = tinh?.districts.find(
+      (district) => district.name === selectHuyen
+    );
+    const arrXa = [];
+
+    // Nếu tìm thấy quận, lấy danh sách các phường
+    if (huyen) {
+      huyen.wards.forEach((item) => {
+        console.log("Ward:", item.name);
+        arrXa.push(item.name); // Thêm tên phường vào mảng
+      });
+    }
+
+    console.log("Wards:", arrXa);
+    // Cập nhật state với danh sách phường
+    setXa(arrXa);
+  };
+  const Xa = (e) => {
+    const xa = e.target.value;
+    setSelectXa(xa);
+  };
+  useEffect(() => {
+    fetchData();
+    // setOrder([{id:id ,name:name , color:color,size:size}])
+  }, []);
   return (
     <div>
-          <header className="cs_site_header cs_style_1 cs_primary_color cs_site_header_full_width cs_sticky_header">
+      <header className="cs_site_header cs_style_1 cs_primary_color cs_site_header_full_width cs_sticky_header">
         <Menu></Menu>
       </header>
       <section>
         <div className="container">
           <div className="cs_height_80 cs_height_lg_60"></div>
           <div className="cs_shop_page_heading text-center">
-            <h1 className="cs_fs_50 cs_bold">Checkout</h1>
+            <h1 className="cs_fs_50 cs_bold">Thanh toán</h1>
             <div className="cs_shop_breadcamp cs_medium">
-              <a href="index.html">Home</a>
+              <Link to={"/"}>Home</Link>
               <svg
                 width="17"
                 height="8"
@@ -35,121 +164,147 @@ const Checkout = () => {
       <div className="container">
         <div className="row">
           <div className="col-xl-7">
-            <p className="cs_checkout-alert m-0">
-              Have a coupon? <a href="">Click here to enter your code</a>
-            </p>
             <div className="cs_height_40 cs_height_lg_40"></div>
-            <h2 className="cs_checkout-title cs_fs_28">Billing Details</h2>
+            <h2 className="cs_checkout-title cs_fs_28">Thông tin đơn hàng</h2>
             <div className="cs_height_45 cs_height_lg_40"></div>
             <div className="row">
               <div className="col-lg-6">
-                <label className="cs_shop-label">First Name *</label>
-                <input type="text" className="cs_shop-input" />
+                {/* <label className="cs_shop-label">First Name *</label> */}
+                <select
+                  type="text"
+                  className="cs_shop-input"
+                  placeholder="vui lòng chọn thành phố"
+                  onChange={handeltinh}
+                  value={selectTinh}
+                >
+                  <option value="">Nhập thành phố</option>
+                  {tinh.map((item) => (
+                    <option key={item.id} value={item.name}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
                 <div
                   data-lastpass-icon-root="true"
-                  style={{position: "relative !important", height: "0px !important", width: "0px !important", float: "left !important"}}
+                  style={{
+                    position: "relative !important",
+                    height: "0px !important",
+                    width: "0px !important",
+                    float: "left !important",
+                  }}
                 ></div>
               </div>
               <div className="col-lg-6">
-                <label className="cs_shop-label">Last Name *</label>
-                <input type="text" className="cs_shop-input" />
-              </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">Company name (optional)</label>
-                <input type="text" className="cs_shop-input" />
-              </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">Country / Region *</label>
-                <select className="cs_shop-input">
-                  <option value="States">United States (US)</option>
-                  <option value="Kingdom">United Kingdom</option>
-                  <option value="Kanada">Kanada</option>
+                {/* <label className="cs_shop-label">Last Name *</label> */}
+                <select
+                  type="text"
+                  className="cs_shop-input"
+                  onChange={handleHuyen}
+                  // value={isselectHuyen}
+                >
+                  <option value="">Nhập huyện</option>
+                  {huyen.map((item) => (
+                    <option key={item.code} value={item.name}>
+                      {item}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">Street address *</label>
+              <div className="col-lg-6">
+                {/* <label className="cs_shop-label">First Name *</label> */}
+                <select
+                  type="text"
+                  className="cs_shop-input"
+                  onChange={Xa}
+                  value={selectXa}
+                >
+                  <option value="">Nhập xã</option>
+                  {xa.map((item) => (
+                    <option key={item.code} value={item.name}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+                <div
+                  data-lastpass-icon-root="true"
+                  style={{
+                    position: "relative !important",
+                    height: "0px !important",
+                    width: "0px !important",
+                    float: "left !important",
+                  }}
+                ></div>
+              </div>
+              <div className="col-lg-6">
+                {/* <label className="cs_shop-label">Last Name *</label> */}
                 <input
                   type="text"
                   className="cs_shop-input"
-                  placeholder="House number and street name"
+                  placeholder="Nhập địa chỉ chi tiết"
+                  name="chitiet"
+                  onChange={handleChange}
+                  value={input.chitiet}
+                />
+              </div>
+
+              <div className="col-lg-12">
+                {/* <label className="cs_shop-label">Street address *</label> */}
+                <input
+                  type="number"
+                  className="cs_shop-input"
+                  placeholder="Nhập số điện thoại"
+                  name="sdt"
+                  onChange={handleChange}
+                  value={input.sdt}
                 />
                 <input
                   type="text"
                   className="cs_shop-input"
-                  placeholder="Apartment, suite, unit, etc (optional) "
+                  placeholder="Nhập tên người nhận"
+                  name="nguoinhan"
+                  onChange={handleChange}
+                  value={input.nguoinhan}
                 />
-              </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">Town / City *</label>
-                <input type="text" className="cs_shop-input" />
-              </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">State *</label>
-                <select className="cs_shop-input">
-                  <option value="California">California</option>
-                  <option value="Gercy">New Gercy</option>
-                  <option value="Daiking">Daiking</option>
-                </select>
-              </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">ZIP Code *</label>
-                <input type="text" className="cs_shop-input" />
-              </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">Phone *</label>
-                <input type="text" className="cs_shop-input" />
-              </div>
-              <div className="col-lg-12">
-                <label className="cs_shop-label">Email address *</label>
-                <input type="text" className="cs_shop-input" />
               </div>
             </div>
-            <div className="cs_height_45 cs_height_lg_45"></div>
-            <h2 className="cs_checkout-title">Additional information</h2>
-            <div className="cs_height_25 cs_height_lg_25"></div>
-            <label className="cs_shop-label">Order notes (optional)</label>
-            <textarea cols="30" rows="6" className="cs_shop-input"></textarea>
-            <div className="cs_height_30 cs_height_lg_30"></div>
           </div>
           <div className="col-xl-5">
             <div className="cs_shop-side-spacing">
               <div className="cs_shop-card">
-                <h2 className="cs_fs_21">Your order</h2>
+                <h2 className="cs_fs_21">Thanh toán</h2>
                 <table>
                   <tbody>
                     <tr className="cs_semi_bold">
-                      <td>Products</td>
-                      <td className="text-end">Amount</td>
+                      <td>Sản phẩm</td>
+                      <td className="text-end">{data && data.name}</td>
                     </tr>
                     <tr>
-                      <td>Awesome men T-shirt x 1</td>
-                      <td className="text-end">$20.00</td>
+                      <td>màu sắc</td>
+                      <td className="text-end">{data && data.color}</td>
                     </tr>
                     <tr>
-                      <td>Future AI robot toy x 1</td>
-                      <td className="text-end">$550.00</td>
+                      <td>kích cỡ</td>
+                      <td className="text-end">{data && data.size}</td>
                     </tr>
                     <tr>
-                      <td>Hemp seed shampoo x 1</td>
-                      <td className="text-end">$35.00</td>
+                      <td>số lượng</td>
+                      <td className="text-end">{data && data.quantity}</td>
                     </tr>
                     <tr>
-                      <td className="cs_semi_bold">Subtotal</td>
-                      <td className="text-end">$605.00</td>
-                    </tr>
-                    <tr className="cs_semi_bold">
-                      <td>Total</td>
-                      <td className="text-end">$605.00</td>
+                      <td>Thành tiền</td>
+                      <td className="text-end">
+                        {total(data.quantity, data.price)}
+                      </td>
                     </tr>
                   </tbody>
                 </table>
                 <div className="cs_height_30 cs_height_lg_30"></div>
-                <a
-                  href="success.html"
+                <button
                   className="cs_btn cs_style_1 cs_fs_16 cs_medium w-100"
+                  onClick={thanhtoan}
                 >
-                  Place Order
-                </a>
+                  Thanh toán khi nhận hàng
+                </button>
               </div>
               <div className="cs_height_50 cs_height_lg_30"></div>
               <div className="cs_shop-card">
@@ -158,37 +313,23 @@ const Checkout = () => {
                   <tbody>
                     <tr>
                       <td>
-                        <div className="form-check cs_fs_16">
-                          <input
-                            className="form-check-input"
-                            type="checkbox"
-                            value=""
-                            id="flexCheckDefault"
-                            checked=""
-                          />
-                          <label
-                            className="form-check-label m-0 cs_semi_bold"
-                            for="flexCheckDefault"
-                          >
-                            Cash on delivery
-                          </label>
-                        </div>
-                        <p className="m-0 cs_payment_text">
-                          Pay with cash upon delivery.
-                        </p>
+                        <div className="form-check cs_fs_16"></div>
                       </td>
                     </tr>
                   </tbody>
                 </table>
-                <div className="cs_height_20 cs_height_lg_20"></div>
+                {thanhtoanOnline ?(<span className="text-wanning">Chức năng chưa khả dụng vui lòng chọn thanh toán khi nhận hàng</span>):""}
+
+                <div className="cs_height_20 cs_height_lg_20">
+                </div>
                 <p className="m-0 cs_payment_text">
                   Your personal data will be used to process your order, support
                   your experience throughout this website, and for other
                   purposes described in our <a href="">privacy policy</a>.
                 </p>
                 <div className="cs_height_20 cs_height_lg_20"></div>
-                <button className="cs_btn cs_style_1 cs_fs_16 cs_medium w-100">
-                  Pay Now
+                <button className="cs_btn cs_style_1 cs_fs_16 cs_medium w-100" onClick={paymentOnline}>
+                  Thanh toán online
                 </button>
               </div>
               <div className="cs_height_30 cs_height_lg_30"></div>

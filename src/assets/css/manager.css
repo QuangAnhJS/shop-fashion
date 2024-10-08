@@ -1,0 +1,56 @@
+.hover{
+    border-radius: 16px;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+.custum{
+    border-radius:16px ;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+/* Đặt style chung cho input và label */
+.floating-label {
+    position: relative;
+    margin-top: 20px;
+  }
+  
+  input {
+    width: 100%;
+    padding: 12px 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: none !important;
+    outline: none;
+  }
+  
+  label.form {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: white;
+    padding: 0 5px;
+    color: #aaa;
+    transition: 0.2s;
+    pointer-events: none; /* Đảm bảo label không nhận sự kiện chuột */
+  }
+  
+  /* Khi input có focus hoặc có nội dung */
+  input:focus + label,
+  input:not(:placeholder-shown) + label {
+    top: 0 !important;
+    font-size: 12px !important;
+    color: #000 !important;
+    
+  }
+  .custom-select{
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .custum-col{
+    display: flex !important;
+    align-items: center !important;
+  }
+ 
+.custom-img{
+    width: 50% !important;
+  }

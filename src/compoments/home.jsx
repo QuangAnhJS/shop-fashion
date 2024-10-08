@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import "../assets/css/bootstrap.min.css";
 import "../assets/css/fontawesome.min.css";
 import "../assets/css/slick.css";
@@ -8,20 +8,17 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "../assets/css/animated-headline.css";
 import "../assets/css/style.css";
-import aothun from "../assets/images/aothun.jpg";
-import hoodies from "../assets/images/hoodies.jpg";
-import vest from "../assets/images/vest.jpg";
-import muahe from "../assets/images/muahe.jpg";
 import scaled from "../assets/images/8-scaled.jpg";
 import Menscaled from "../assets/images/Men-009-scaled.jpg";
-import aopolo from "../assets/images/aopolo.jpg";
 import aomuadong from "../assets/images/aomuadong.jpg";
-import aokhoac from "../assets/images/aokhoac.jpg";
 import v2 from "../assets/images/v2.jpg";
 import post from "../assets/img/post1.jpg";
 import instagram_1 from "../assets/img/instagram_1.jpg";
 import Menu from "./menu";
 import End from "./end";
+import axiosInstance from "../axios";
+import { Link } from "react-router-dom";
+import Loading from "./loading";
 const Home = () => {
   const settings = {
     dots: true,
@@ -48,10 +45,36 @@ const Home = () => {
   const previous = () => {
     sliderRef.slickPrev();
   };
-const [search,setsearch]=useState(false);
-
+  const [Item, setItem] = useState([]);
+  const [sanphamnoibat, setSanphamnoibat] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const website = async () => {
+    setLoading(true);
+    try {
+      const res = await axiosInstance.get("/api/sanphamnoibat");
+      console.log("noi bat", res.data.data[0].product);
+      setSanphamnoibat(res.data.data[0].product);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    axiosInstance
+      .get("api/website")
+      .then(function (response) {
+        setItem(response.data.data);
+      })
+      .catch(function (error) {
+        console.log(error);
+      })
+      .finally(() => {});
+    website();
+  }, []);
   return (
     <div>
+    {loading&&(<Loading/>)}
       <header className="cs_site_header cs_style_1 cs_primary_color cs_site_header_full_width cs_sticky_header">
         <Menu></Menu>
         <div className="cs_header_search_wrap">
@@ -92,111 +115,63 @@ const [search,setsearch]=useState(false);
           >
             <div className="cs_slider_wrapper">
               <Slider {...settings}>
-                <div>
-                  <div className="slick_slide_in">
-                    <div className="cs_hero cs_style_2 position-relative">
-                      <div className="cs_hero_left">
-                        <div className="cs_hero_text">
-                          <h4 className="cs_hero_title_mini cs_fs_28">
-                            Giảm tới 50%
-                          </h4>
-                          <h1 className="cs_hero_title cs_fs_67 cs_bold">
-                            Bộ sưu tập thời trang nam thanh lịch cho mùa hè.
-                          </h1>
-                          <a
-                            href="shop.php"
-                            className="cs_btn cs_style_1 cs_fs_16 cs_medium"
-                          >
-                            Xem bộ sưu tập
-                          </a>
+                {Item.map((item, index) => (
+                  <div key={index}>
+                    {" "}
+                    {/* Thêm key cho mỗi phần tử */}
+                    <div className="slick_slide_in">
+                      <div className="cs_hero cs_style_2 position-relative">
+                        <div className="cs_hero_left">
+                          <div className="cs_hero_text">
+                            {/* Kiểm tra item tồn tại */}
+                            {item ? (
+                              <div>
+                                <h4 className="cs_hero_title_mini cs_fs_28">
+                                  {item.title}
+                                </h4>
+                                <h1 className="cs_hero_title cs_fs_67 cs_bold">
+                                  {item.description}
+                                  
+                                </h1>
+                              </div>
+                            ) : (
+                              <p className="error-message">
+                                Không tìm thấy sản phẩm.
+                              </p>
+                            )}
+
+                            <a
+                              href="shop.php"
+                              className="cs_btn cs_style_1 cs_fs_16 cs_medium"
+                            >
+                              Xem sản phẩm
+                            </a>
+                          </div>
                         </div>
-                      </div>
-                      <div className="cs_hero_right">
-                        <div className="cs_hero_thumb">
-                          <img src={muahe} alt="Thumb" />
-                        </div>
-                        <div className="cs_animated_text position-absolute">
-                          <img
-                            src="assets/img/animated_text.png"
-                            alt="Text Image"
-                          />
-                          <span className="cs_text_light cs_accent_bg"></span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <div className="slick_slide_in">
-                    <div className="cs_hero cs_style_2 position-relative">
-                      <div className="cs_hero_left">
-                        <div className="cs_hero_text">
-                          <h4 className="cs_hero_title_mini cs_fs_28">
-                            Giảm tới 20%
-                          </h4>
-                          <h1 className="cs_hero_title cs_fs_67 cs_bold">
-                            Bộ sưu tập thời trang nam công sở.
-                          </h1>
-                          <a
-                            href="shop.php"
-                            className="cs_btn cs_style_1 cs_fs_16 cs_medium"
-                          >
-                            Xem bộ sưu tập
-                          </a>
-                        </div>
-                      </div>
-                      <div className="cs_hero_right">
-                        <div className="cs_hero_thumb">
-                          <img src={scaled} alt="Thumb" />
-                        </div>
-                        <div className="cs_animated_text position-absolute">
-                          <img
-                            src="assets/img/animated_text.png"
-                            alt="Text Image"
-                          />
-                          <span className="cs_text_light cs_accent_bg"></span>
+                        <div className="cs_hero_right">
+                          {/* Sửa lỗi ở đây: Sử dụng item.link thay vì Item.link */}
+                          {item ? (
+                            <img src={item.link} alt="Thumb" />
+                          ) : (
+                            <p>Đang tải hình ảnh...</p>
+                          )}
+                          <div className="cs_animated_text position-absolute">
+                            <img
+                              src="assets/img/animated_text.png"
+                              alt="Text Image"
+                            />
+                            <span className="cs_text_light cs_accent_bg"></span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div>
-                  <div className="slick_slide_in">
-                    <div className="cs_hero cs_style_2 position-relative">
-                      <div className="cs_hero_left">
-                        <div className="cs_hero_text">
-                          <h4 className="cs_hero_title_mini cs_fs_28">
-                            Giảm tới 40%
-                          </h4>
-                          <h1 className="cs_hero_title cs_fs_67 cs_bold">
-                            Bộ sưu tập thời trang nam mùa đông.
-                          </h1>
-                          <a
-                            href="shop.php"
-                            className="cs_btn cs_style_1 cs_fs_16 cs_medium"
-                          >
-                            Xem bộ sưu tập
-                          </a>
-                        </div>
-                      </div>
-                      <div className="cs_hero_right">
-                        <div className="cs_hero_thumb">
-                          <img src={Menscaled} alt="Thumb" />
-                        </div>
-                        <div className="cs_animated_text position-absolute">
-                          <img
-                            src="assets/img/animated_text.png"
-                            alt="Text Image"
-                          />
-                          <span className="cs_text_light cs_accent_bg"></span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                ))}
+
+           
               </Slider>
             </div>
-            <div className="cs_pagingInfo cs_style_1">iifn</div>
+            <div className="cs_pagingInfo cs_style_1"></div>
           </div>
           <div className="cs_slides_numbers">
             <span className="active">01</span>
@@ -410,199 +385,49 @@ const [search,setsearch]=useState(false);
                 }}
                 {...slickbanchay}
               >
-                <div className="slick_slide_in">
-                  <div className="cs_product cs_style_1 cs_bordered">
-                    <div className="cs_product_thumb position-relative">
-                      <img src={aothun} alt="Product Image" className="w-100" />
-                      <div className="cs_cart_badge position-absolute">
-                        <a
-                          href="wishlist.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-heart"></i>
-                        </a>
-                        <a
-                          href="product_details.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-eye"></i>
-                        </a>
+                {sanphamnoibat.map((item, index) => {
+                  return (
+                    <div className="slick_slide_in">
+                      <div className="cs_product cs_style_1 cs_bordered">
+                        <div className="cs_product_thumb position-relative">
+                          <img
+                            src={item.img.img1}
+                            alt="Product Image"
+                            className="w-100"
+                          />
+                          <div className="cs_cart_badge position-absolute">
+                            <a
+                              href="wishlist.php"
+                              className="cs_cart_icon cs_accent_bg cs_white_color"
+                            >
+                              <i className="fa-regular fa-heart"></i>
+                            </a>
+                            <Link
+                              to={`product_details/${item.id}`}
+                              className="cs_cart_icon cs_accent_bg cs_white_color"
+                            >
+                              <i className="fa-regular fa-eye"></i>
+                            </Link>
+                          </div>
+                          <Link
+                           to={`product_details/${item.id}`}
+                            className="cs_cart_btn cs_accent_bg cs_fs_16 cs_white_color cs_medium position-absolute"
+                          >
+                            Xem sản phẩm
+                          </Link>
+                        </div>
+                        <div className="cs_product_info text-center">
+                          <h3 className="cs_product_title cs_fs_21 cs_medium">
+                            <a href="product_details.php">{item.name}</a>
+                          </h3>
+                          <p className="cs_product_price cs_fs_18 cs_accent_color mb-0 cs_medium">
+                            200.000 VNĐ
+                          </p>
+                        </div>
                       </div>
-                      <a
-                        href="cart.php"
-                        className="cs_cart_btn cs_accent_bg cs_fs_16 cs_white_color cs_medium position-absolute"
-                      >
-                        Thêm Vào Giỏ
-                      </a>
                     </div>
-                    <div className="cs_product_info text-center">
-                      <h3 className="cs_product_title cs_fs_21 cs_medium">
-                        <a href="product_details.php">
-                          Áo thun nam màu đen thuần cotton.
-                        </a>
-                      </h3>
-                      <p className="cs_product_price cs_fs_18 cs_accent_color mb-0 cs_medium">
-                        200.000 VNĐ
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="slick_slide_in">
-                  <div className="cs_product cs_style_1 cs_bordered">
-                    <div className="cs_product_thumb position-relative">
-                      <img
-                        src={hoodies}
-                        alt="Product Image"
-                        className="w-100"
-                      />
-                      <div className="cs_cart_badge position-absolute">
-                        <a
-                          href="wishlist.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-heart"></i>
-                        </a>
-                        <a
-                          href="product_details.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-eye"></i>
-                        </a>
-                      </div>
-                      <a
-                        href="cart.php"
-                        className="cs_cart_btn cs_accent_bg cs_fs_16 cs_white_color cs_medium position-absolute"
-                      >
-                        Thêm Vào Giỏ
-                      </a>
-                    </div>
-                    <div className="cs_product_info text-center">
-                      <h3 className="cs_product_title cs_fs_21 cs_medium">
-                        <a href="product_details.php">
-                          Áo hoodies nam trẻ trung
-                        </a>
-                      </h3>
-                      <p className="cs_product_price cs_fs_18 cs_accent_color mb-0 cs_medium">
-                        450.000 VNĐ
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="slick_slide_in">
-                  <div className="cs_product cs_style_1 cs_bordered">
-                    <div className="cs_product_thumb position-relative">
-                      <img src={vest} alt="Product Image" className="w-100" />
-                      <div className="cs_cart_badge position-absolute">
-                        <a
-                          href="wishlist.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-heart"></i>
-                        </a>
-                        <a
-                          href="product_details.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-eye"></i>
-                        </a>
-                      </div>
-                      <a
-                        href="cart.php"
-                        className="cs_cart_btn cs_accent_bg cs_fs_16 cs_white_color cs_medium position-absolute"
-                      >
-                        Thêm Vào Giỏ
-                      </a>
-                    </div>
-                    <div className="cs_product_info text-center">
-                      <h3 className="cs_product_title cs_fs_21 cs_medium">
-                        <a href="product_details.php">Áo vest cổ hai ve</a>
-                      </h3>
-                      <p className="cs_product_price cs_fs_18 cs_accent_color mb-0 cs_medium">
-                        1.000.000 VNĐ
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="slick_slide_in">
-                  <div className="cs_product cs_style_1 cs_bordered">
-                    <div className="cs_product_thumb position-relative">
-                      <img src={aopolo} alt="Product Image" className="w-100" />
-                      <div className="cs_cart_badge position-absolute">
-                        <a
-                          href="wishlist.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-heart"></i>
-                        </a>
-                        <a
-                          href="product_details.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-eye"></i>
-                        </a>
-                      </div>
-                      <a
-                        href="cart.php"
-                        className="cs_cart_btn cs_accent_bg cs_fs_16 cs_white_color cs_medium position-absolute"
-                      >
-                        Thêm Vào Giỏ
-                      </a>
-                    </div>
-                    <div className="cs_product_info text-center">
-                      <h3 className="cs_product_title cs_fs_21 cs_medium">
-                        <a href="product_details.php">
-                          Áo Polo Nam cổ bẻ Basic
-                        </a>
-                      </h3>
-                      <p className="cs_product_price cs_fs_18 cs_accent_color mb-0 cs_medium">
-                        150.000 VNĐ
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="slick_slide_in">
-                  <div className="cs_product cs_style_1 cs_bordered">
-                    <div className="cs_product_thumb position-relative">
-                      <img
-                        src={aokhoac}
-                        alt="Product Image"
-                        className="w-100"
-                      />
-                      <div className="cs_cart_badge position-absolute">
-                        <a
-                          href="wishlist.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-heart"></i>
-                        </a>
-                        <a
-                          href="product_details.php"
-                          className="cs_cart_icon cs_accent_bg cs_white_color"
-                        >
-                          <i className="fa-regular fa-eye"></i>
-                        </a>
-                      </div>
-                      <a
-                        href="cart.php"
-                        className="cs_cart_btn cs_accent_bg cs_fs_16 cs_white_color cs_medium position-absolute"
-                      >
-                        Thêm Vào Giỏ
-                      </a>
-                    </div>
-                    <div className="cs_product_info text-center">
-                      <h3 className="cs_product_title cs_fs_21 cs_medium">
-                        <a href="product_details.php">
-                          Áo khoác nam hàng hiệu vải dạ cao cấp
-                        </a>
-                      </h3>
-                      <p className="cs_product_price cs_fs_18 cs_accent_color mb-0 cs_medium">
-                        300.000 VNĐ
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                  );
+                })}
               </Slider>
             </div>
           </div>
@@ -675,7 +500,7 @@ const [search,setsearch]=useState(false);
                   <img src={aomuadong} alt="Card Image" />
                 </div>
               </div>
-              <div className="col-lg-6 align-items-center">
+              <div className="col-lg-6 align-Items-center">
                 <div className="cs_card_info">
                   <h2 className="cs_card_title cs_fs_50 cs_bold">
                     Áo khoác mùa đông, ưu đãi giới hạn thời gian, giảm giá 40%.
@@ -968,7 +793,7 @@ const [search,setsearch]=useState(false);
         <a
           href="#"
           target="_blank"
-          className="position-relative cs_instagram_item"
+          className="position-relative cs_instagram_Item"
         >
           <div className="cs_instagram_thumb position-relative">
             <img src={instagram_1} alt="Instagram" />
@@ -980,7 +805,7 @@ const [search,setsearch]=useState(false);
         <a
           href="#"
           target="_blank"
-          className="position-relative cs_instagram_item"
+          className="position-relative cs_instagram_Item"
         >
           <div className="cs_instagram_thumb position-relative">
             <img src={instagram_1} alt="Instagram" />
@@ -992,7 +817,7 @@ const [search,setsearch]=useState(false);
         <a
           href="#"
           target="_blank"
-          className="position-relative cs_instagram_item"
+          className="position-relative cs_instagram_Item"
         >
           <div className="cs_instagram_thumb position-relative">
             <img src={instagram_1} alt="Instagram" />
@@ -1004,7 +829,7 @@ const [search,setsearch]=useState(false);
         <a
           href="#"
           target="_blank"
-          className="position-relative cs_instagram_item"
+          className="position-relative cs_instagram_Item"
         >
           <div className="cs_instagram_thumb position-relative">
             <img src={instagram_1} alt="Instagram" />
@@ -1016,7 +841,7 @@ const [search,setsearch]=useState(false);
         <a
           href="#"
           target="_blank"
-          className="position-relative cs_instagram_item"
+          className="position-relative cs_instagram_Item"
         >
           <div className="cs_instagram_thumb position-relative">
             <img src={instagram_1} alt="Instagram" />
@@ -1028,7 +853,7 @@ const [search,setsearch]=useState(false);
         <a
           href="#"
           target="_blank"
-          className="position-relative cs_instagram_item"
+          className="position-relative cs_instagram_Item"
         >
           <div className="cs_instagram_thumb position-relative">
             <img src={instagram_1} alt="Instagram" />
@@ -1038,7 +863,7 @@ const [search,setsearch]=useState(false);
           </div>
         </a>
       </div>
-     <End></End>
+      <End></End>
     </div>
   );
 };

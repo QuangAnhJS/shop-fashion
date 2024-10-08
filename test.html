@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* Đặt style chung cho input và label */
+.floating-label {
+  position: relative;
+  margin-top: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+}
+
+label {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: white;
+  padding: 0 5px;
+  color: #aaa;
+  transition: 0.2s;
+  pointer-events: none; /* Đảm bảo label không nhận sự kiện chuột */
+}
+
+/* Khi input có focus hoặc có nội dung */
+input:focus + label,
+input:not(:placeholder-shown) + label {
+  top: 0;
+  font-size: 12px;
+  color: #000;
+}
+
+    </style>
+</head>
+<body>
+    <div class="floating-label">
+        <input type="text" id="name" name="name" placeholder=" " required />
+        <label for="name">Tên</label>
+      </div>
+      
+</body>
+</html>

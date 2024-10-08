@@ -67,7 +67,7 @@ const Contact = () => {
                   <h3 class="cs_iconbox_title cs_fs_21 cs_semibold">
                     Email address
                   </h3>
-                  <p class="cs_iconbox_subtitle mb-0">HDQuanDev@QDevS.tech</p>
+                  <p class="cs_iconbox_subtitle mb-0">anhtq.programmer@gmail.com</p>
                 </div>
               </div>
               <div class="cs_height_50 cs_height_lg_30"></div>
@@ -97,7 +97,7 @@ const Contact = () => {
                   <h3 class="cs_iconbox_title cs_fs_21 cs_semibold">
                     Live support
                   </h3>
-                  <p class="cs_iconbox_subtitle mb-0">087 787 2003</p>
+                  <p class="cs_iconbox_subtitle mb-0">0866598542</p>
                 </div>
               </div>
             </div>
